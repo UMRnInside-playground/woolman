@@ -26,6 +26,13 @@ const inventory = require("./lib/inventory.js")
 global.bot = bot
 global.ad_active = true
 
+const colors = [
+    "white", "orange", "magenta", "light blue",
+    "yellow", "lime", "pink", "gray",
+    "light gray", "cyan", "purple", "blue",
+    "brown", "green", "red", "black"
+]
+
 bot.on('whisper', (username, message) => {
     if (username === bot.username) return
     const command = message.split(' ')
@@ -93,6 +100,12 @@ bot.on('whisper', (username, message) => {
         case /^setmask \d+/.test(message):
             global.WoolMask = parseInt(command[1], 10)
             bot.whisper(username, `Mark changed to ${global.WoolMask}`)
+            break
+        case /^xormask \d+/.test(message):
+            var arg = parseInt(command[1], 10)
+            global.WoolMask = global.WoolMask ^ (1 << arg)
+            var action = global.WoolMask & (1 << arg) ? "collecting" : "ignoring"
+            bot.whisper(username, `${global.WoolMask}, now ${action} ${colors[arg]} wool.`)
             break
         case /^reset$/.test(message):
             Reset()
