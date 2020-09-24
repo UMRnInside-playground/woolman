@@ -23,6 +23,8 @@ global.working = false;
 
 const navigator = require("./lib/navigator.js")
 const inventory = require("./lib/inventory.js")
+const sheeputil = require("./lib/sheeputil.js")
+
 global.bot = bot
 global.ad_active = true
 
@@ -83,7 +85,7 @@ bot.on('whisper', (username, message) => {
             autowork()
             break
         case /^shear$/.test(message):
-            var target = findAvailableSheep()
+            var target = sheeputil.findAvailableSheep(bot)
             goShearSheep(target)
             break
         case /^stop$/.test(message):
@@ -150,10 +152,10 @@ function ResumeWork()
     console.log("ResumeWork")
     global.working = true
     if (global.cmd1)
-        setTimeout(() => bot.chat(global.cmd1) , 3000);
+        setTimeout(() => bot.chat(global.cmd1) , 1000);
     if (global.cmd2)
-        setTimeout(() => bot.chat(global.cmd2) , 7000);
-    setTimeout(autowork, 15000)
+        setTimeout(() => bot.chat(global.cmd2) , 4500);
+    setTimeout(autowork, 9000)
 }
 
 
@@ -181,85 +183,6 @@ bot.on('login', function()
     }
 )
 
-
-function findAvailableSheep()
-{
-    function isInRange(l, x, r)
-    {
-        return l<=x && x<=r
-    }
-    function dist(entity)
-    {
-        return Math.abs(bot.entity.position.x - entity.position.x) 
-            +  Math.abs(bot.entity.position.z - entity.position.z)
-    }
-    var total = 0;
-    var not_sheared = 0;
-
-    var target = null;
-    for (var key in bot.entities)
-    {
-        if (bot.entities[key].mobType !== "Sheep")
-            continue
-
-        if (!isInRange(SheepMinX, bot.entities[key].position.x, SheepMaxX))
-            continue
-        if (!isInRange(SheepMinZ, bot.entities[key].position.z, SheepMaxZ))
-            continue
-        if (bot.entities[key].position.y != ItemExpectedY)
-            continue
-        total++;
-
-        // Adapted for 1.8, change 13 to 16 in 1.9+?
-        // 13 is for 1.12
-        //var sheep_info = bot.entities[key].metadata[13]
-        var sheep_info = bot.entities[key].metadata[16]
-
-        if (sheep_info & 16) // Sheared
-            continue
-        not_sheared++;
-
-        // Unwanted color
-        var match = (1 << (sheep_info & 0xF)) & global.WoolMask
-        if (!match)
-            continue
-
-        if (!target)
-            target = bot.entities[key]
-        else if (dist(bot.entities[key]) < dist(target))
-            target = bot.entities[key]
-    }
-    console.log(total, "sheeps,", not_sheared, "shearable")
-    //console.log(target.metadata)
-    return target
-}
-
-function findDroppedWool()
-{
-    function isInRange(l, x, r)
-    {
-        return l<=x && x<=r
-    }
-    for (var key in bot.entities)
-    {
-        if (bot.entities[key].objectType !== "Dropped item") // in 1.8
-            continue
-        if (!bot.entities[key].metadata[10]) // Object metadata in 1.8
-            continue
-        if (bot.entities[key].metadata[10].blockId !== 35) // Wool in 1.8
-            continue
-
-        if (!isInRange(SheepMinX, bot.entities[key].position.x, SheepMaxX))
-            continue
-        if (!isInRange(SheepMinZ, bot.entities[key].position.z, SheepMaxZ))
-            continue
-        if (bot.entities[key].position.y != ItemExpectedY)
-            continue
-        return bot.entities[key]
-    }
-    return null
-
-}
 function goShearSheep(target, callback)
 {
     if (!target)
@@ -293,7 +216,7 @@ function autowork()
     {
         if (global.working)
         {
-            var target = findDroppedWool()
+            var target = sheeputil.findDroppedWool(bot)
             if (target)
             {
                 console.log("Found dropped wool", target.position)
@@ -319,7 +242,7 @@ function autowork()
             return
         }
 
-        var sheep = findAvailableSheep()
+        var sheep = sheeputil.findAvailableSheep(bot)
         if (sheep)
         {
             console.log("Found sheep")
