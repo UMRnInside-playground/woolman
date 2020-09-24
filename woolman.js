@@ -264,6 +264,17 @@ function autowork()
     }
     function autostore()
     {
+        if (global.StorageRequiresTp)
+        {
+            console.log("StorageRequiresTp")
+            if (global.storage_cmd1)
+                setTimeout(() => bot.chat(global.storage_cmd1) , 1000);
+            if (global.storage_cmd2)
+                setTimeout(() => bot.chat(global.storage_cmd2) , 4500);
+            setTimeout( () => autotoss(ResumeWork), 8000)
+            return
+        }
+
         navigator.goToWork(global.tossingPosition, function(){
             bot.lookAt(global.tossingLookingAtPosition)
             setTimeout( () => autotoss(function() {
