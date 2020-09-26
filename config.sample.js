@@ -20,6 +20,10 @@ global.tossingLookingAtPosition = Vec3(814, 64, 1003)
 // where i is the DataValue of a wool
 global.WoolMask = 65535
 
+// For sheep
+global.StatsUnchangedTolerance = 24
+global.StatsUnchangedPreferReset = false
+
 // Useful in some servers
 global.cmd1 = "/stp ss"
 global.cmd2 = "/home"

@@ -9,6 +9,8 @@ if (process.argv.length < 4 || process.argv.length > 6) {
 }
 const config = require(process.argv[5] ? process.argv[5] : "./config.js")
 global.WoolMask = global.WoolMask ? global.WoolMask : 0xFFFF
+if (!global.StatsUnchangedTolerance)
+    global.StatsUnchangedTolerance = 7
 
 global.bot = mineflayer.createBot({
     host: process.argv[2],
@@ -275,19 +277,33 @@ function autowork()
                 {
                     console.log(`Stats unchanged!`)
                     last_status.repeats += 1
-                    if (last_status.repeats >= 24)
+                    if (last_status.repeats >= global.StatsUnchangedTolerance)
                     {
                         if (last_status.total_failure >= 3)
                         {
                             console.log(`CRITICAL ERROR!`)
                             process.exit(1)
                         }
-                        console.log(`Stats repeated 24 times, resetting...`)
+                        console.log(`Stats repeated too much!`)
                         console.log(`Bot position: ${bot.entity.position}`)
                         console.log(`Target sheep:`)
                         console.log(sheep)
+
                         last_status.total_failure += 1
-                        Reset()
+
+                        if (global.StatsUnchangedPreferReset)
+                        {
+                            Reset()
+                        }
+                        else
+                        {
+                            setTimieout(() => {
+                                console.log("idle to escape...")
+                                const shear_cb = () => setTimeout(autoshear, 5000)
+                                navigator.goToWork(global.idlePosition, shear_cb, Reset)
+                            }, 1000)
+                        }
+
                         return
                     }
                 }
