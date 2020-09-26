@@ -223,6 +223,11 @@ function autotoss(final_callback)
         bot.toss(35, null, count, final_callback)
 }
 
+last_wool = {
+    id: 0,
+    position: Vec3(0, 0, 0)
+}
+
 function autowork()
 {
     console.log("Start autowork")
@@ -231,7 +236,7 @@ function autowork()
         if (global.working)
         {
             var target = sheeputil.findDroppedWool(bot)
-            if (target)
+            if (target && (target.id !== last_wool.id || !target.position.equals(last_wool.position)) )
             {
                 console.log("Found dropped wool", target.position)
                 navigator.goToWork(target.position, function() {
@@ -242,6 +247,8 @@ function autowork()
             {
                 callback()
             }
+            last_wool.id = target.id
+            last_wool.position = target.position
         }
     }
     function autoshear()
