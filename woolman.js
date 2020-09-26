@@ -242,13 +242,13 @@ function autowork()
                 navigator.goToWork(target.position, function() {
                     setTimeout(() => pick_then_act(callback), 1000)
                 }, Reset)
+                last_wool.id = target.id
+                last_wool.position = target.position
             }
             else
             {
                 callback()
             }
-            last_wool.id = target.id
-            last_wool.position = target.position
         }
     }
     function autoshear()
