@@ -294,7 +294,7 @@ function autowork()
                     last_status.repeats += 1
                     if (last_status.repeats >= global.StatsUnchangedTolerance)
                     {
-                        if (last_status.total_failure >= 3)
+                        if (last_status.failures >= 3)
                         {
                             console.log(`CRITICAL ERROR!`)
                             process.exit(1)
@@ -304,7 +304,7 @@ function autowork()
                         console.log(`Target sheep:`)
                         console.log(sheep)
 
-                        last_status.total_failure += 1
+                        last_status.total_failures += 1
 
                         if (global.StatsUnchangedPreferReset)
                         {
