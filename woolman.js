@@ -186,6 +186,7 @@ bot.on('login', function()
 
 bot.on('kicked', (reason) => {
     console.log(`I got kicked for`, reason)
+    process.exit(0)
 })
 
 function goShearSheep(target, callback)
