@@ -28,6 +28,13 @@ const sheeputil = require("./lib/sheeputil.js")
 global.bot = bot
 global.ad_active = true
 
+global.last_status = {
+    bot_position: Vec3(0, 0, 0),
+    wools: 0,
+    repeats: 0,
+    failures: 0
+}
+
 const colors = [
     "white", "orange", "magenta", "light blue",
     "yellow", "lime", "pink", "gray",
@@ -154,10 +161,9 @@ function ResumeWork()
     if (global.cmd1)
         setTimeout(() => bot.chat(global.cmd1) , 1000);
     if (global.cmd2)
-        setTimeout(() => bot.chat(global.cmd2) , 4500);
+        setTimeout(() => bot.chat(global.cmd2) , 5000);
     setTimeout(autowork, 9000)
 }
-
 
 bot.on('login', function()
     {
@@ -182,6 +188,14 @@ bot.on('login', function()
         setTimeout(ResumeWork, 10000)
     }
 )
+
+bot.on('spawn', () => {
+    console.log(`Spawned at (floored) ${bot.entity.position.floored()}`)
+})
+
+bot.on('kicked', (reason) => {
+    console.log(`I got kicked for ${reason}`)
+})
 
 function goShearSheep(target, callback)
 {
@@ -241,19 +255,51 @@ function autowork()
             Reset()
             return
         }
+        console.log(`I'm at ${bot.entity.position.floored()}`)
 
         var sheep = sheeputil.findAvailableSheep(bot)
         if (sheep)
         {
-            console.log("Found sheep")
+            console.log("Found sheep, updating last status")
             goShearSheep(sheep, function() {
-                console.log("wools", inventory.countItemByName("wool"))
-                if (inventory.countItemByName("wool") >= 128)
+                const wools_in_inventory = inventory.countItemByName("wool")
+                console.log("wools", wools_in_inventory)
+                if (last_status.bot_position.equals(bot.entity.position) && 
+                    last_status.wools === wools_in_inventory)
+                {
+                    console.log(`Stats unchanged!`)
+                    last_status.repeats += 1
+                    if (last_status.repeats >= 24)
+                    {
+                        if (last_status.total_failure >= 3)
+                        {
+                            console.log(`CRITICAL ERROR!`)
+                            process.exit(1)
+                        }
+                        console.log(`Stats repeated 24 times, resetting...`)
+                        console.log(`Bot position: ${bot.entity.position}`)
+                        console.log(`Target sheep:`)
+                        console.log(sheep)
+                        last_status.total_failure += 1
+                        Reset()
+                        return
+                    }
+                }
+                else
+                {
+                    last_status.bot_position = bot.entity.position
+                    last_status.wools = wools_in_inventory
+                    last_status.repeats = 0
+                }
+
+                if (wools_in_inventory >= 128)
                 {
                     setTimeout(autostore, 1000)
                 }
                 else
-                    setTimeout(autoshear, 200)
+                {
+                    setTimeout(autoshear, 500)
+                }
             })
             return
         }
@@ -267,11 +313,12 @@ function autowork()
         if (global.StorageRequiresTp)
         {
             console.log("StorageRequiresTp")
+            global.working = false
             if (global.storage_cmd1)
                 setTimeout(() => bot.chat(global.storage_cmd1) , 1000);
             if (global.storage_cmd2)
-                setTimeout(() => bot.chat(global.storage_cmd2) , 4500);
-            setTimeout( () => autotoss(ResumeWork), 8000)
+                setTimeout(() => bot.chat(global.storage_cmd2) , 5000);
+            setTimeout( () => autotoss(ResumeWork), 12000)
             return
         }
 
