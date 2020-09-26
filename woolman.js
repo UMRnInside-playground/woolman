@@ -226,7 +226,7 @@ function autotoss(final_callback)
 function autowork()
 {
     console.log("Start autowork")
-    function idle_or_pick(callback)
+    function pick_then_act(callback)
     {
         if (global.working)
         {
@@ -235,13 +235,12 @@ function autowork()
             {
                 console.log("Found dropped wool", target.position)
                 navigator.goToWork(target.position, function() {
-                    setTimeout(() => idle_or_pick(callback), 1000)
+                    setTimeout(() => pick_then_act(callback), 1000)
                 }, Reset)
             }
             else
             {
-                console.log("idle...")
-                navigator.goToWork(global.idlePosition, callback, Reset)
+                callback()
             }
         }
     }
@@ -298,14 +297,18 @@ function autowork()
                 }
                 else
                 {
-                    setTimeout(autoshear, 500)
+                    setTimeout(() => {
+                        pick_then_act(autoshear)
+                    }, 1000)
                 }
             })
             return
         }
         // no sheep available, wait 5s
-        idle_or_pick(function() {
-            setTimeout(autoshear, 5000)
+        pick_then_act(function() {
+            console.log("idle...")
+            const shear_cb = () => setTimeout(autoshear, 5000)
+            navigator.goToWork(global.idlePosition, shear_cb, Reset)
         })
     }
     function autostore()
@@ -325,7 +328,7 @@ function autowork()
         navigator.goToWork(global.tossingPosition, function(){
             bot.lookAt(global.tossingLookingAtPosition)
             setTimeout( () => autotoss(function() {
-                idle_or_pick(autoshear)
+                pick_then_act(autoshear)
             }), 2000)
         }, Reset)
     }
