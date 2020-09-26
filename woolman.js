@@ -297,7 +297,7 @@ function autowork()
                         }
                         else
                         {
-                            setTimieout(() => {
+                            setTimeout(() => {
                                 console.log("idle to escape...")
                                 const shear_cb = () => setTimeout(autoshear, 5000)
                                 navigator.goToWork(global.idlePosition, shear_cb, Reset)
