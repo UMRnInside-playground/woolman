@@ -16,7 +16,7 @@ global.bot = mineflayer.createBot({
     host: process.argv[2],
     port: parseInt(process.argv[3]),
     username: process.argv[4] ? process.argv[4] : "Woolman",
-    version: "1.8"
+    version: "1.15.2"
 })
 // install the plugin
 navigatePlugin(bot);
@@ -160,7 +160,6 @@ function ResumeWork()
     setTimeout(autowork, 9000)
 }
 
-
 bot.on('login', function()
     {
         var password = global.AuthmePassword ? global.AuthmePassword : "12345678" 
@@ -185,6 +184,10 @@ bot.on('login', function()
     }
 )
 
+bot.on('kicked', (reason) => {
+    console.log(`I got kicked for`, reason)
+})
+
 function goShearSheep(target, callback)
 {
     if (!target)
@@ -205,10 +208,24 @@ function goShearSheep(target, callback)
 
 function autotoss(final_callback)
 {
-    var count = inventory.countItemByName("wool")
-    console.log("autotoss", count)
-    if (count && count > 0)
-        bot.toss(35, null, count, final_callback)
+    // After the flatten in 1.13
+    var total = inventory.countItemById(82, 97)
+    console.log("autotoss", total)
+    function wrapped_callback(cur, maxv, fcb)
+    {
+        //console.log(`wrapped_callback(${cur}, ${maxv}, (fcb))`)
+        if (cur > maxv)
+        {
+            fcb()
+            return
+        }
+        const count = inventory.countItemById(cur)
+        if (count && count > 0)
+            bot.toss(cur, null, count, () => wrapped_callback(cur+1, maxv, fcb))
+        else
+            wrapped_callback(cur+1, maxv, fcb)
+    }
+    wrapped_callback(82, 97, final_callback)
 }
 
 last_wool = {
@@ -255,7 +272,7 @@ function autowork()
         {
             console.log("Found sheep")
             goShearSheep(sheep, function() {
-                const wools_in_inventory = inventory.countItemByName("wool")
+                const wools_in_inventory = inventory.countItemById(82, 97)
                 console.log("wools", wools_in_inventory)
                 if (wools_in_inventory >= 128)
                 {
