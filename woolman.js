@@ -250,6 +250,7 @@ function autowork()
     console.log("Start autowork")
     function pick_then_act(callback)
     {
+        const interval = global.AutoShearInterval || 1000
         if (global.working)
         {
             var target = sheeputil.findDroppedWool(bot)
@@ -257,7 +258,7 @@ function autowork()
             {
                 console.log("Found dropped wool", target.position)
                 navigator.goToWork(target.position, function() {
-                    setTimeout(() => pick_then_act(callback), 1000)
+                    setTimeout(() => pick_then_act(callback), interval)
                 }, Reset)
                 last_wool.id = target.id
                 last_wool.position = target.position
@@ -270,6 +271,8 @@ function autowork()
     }
     function autoshear()
     {
+        const interval = global.AutoShearInterval || 1000
+        const capacity = global.AutoStoreMinimumWoolCount || 128
         if (!global.working)
             return
         if (bot.food <= 6)
@@ -287,6 +290,8 @@ function autowork()
             goShearSheep(sheep, function() {
                 const wools_in_inventory = inventory.countItemById(82, 97)
                 console.log("wools", wools_in_inventory)
+
+                // Make HamsterAntiCheat happy
                 if (last_status.bot_position.equals(bot.entity.position) && 
                     last_status.wools === wools_in_inventory)
                 {
@@ -329,7 +334,8 @@ function autowork()
                     last_status.repeats = 0
                 }
 
-                if (wools_in_inventory >= 128)
+                // The logic
+                if (wools_in_inventory >= capacity)
                 {
                     setTimeout(autostore, 1000)
                 }
@@ -337,7 +343,7 @@ function autowork()
                 {
                     setTimeout(() => {
                         pick_then_act(autoshear)
-                    }, 1000)
+                    }, interval)
                 }
             })
             return

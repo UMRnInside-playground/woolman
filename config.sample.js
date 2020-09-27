@@ -20,6 +20,10 @@ global.tossingLookingAtPosition = Vec3(814, 64, 1003)
 // where i is the DataValue of a wool
 global.WoolMask = 65535
 
+// Can be optimized?
+global.AutoShearInterval = 1000
+global.AutoStoreMinimumWoolCount = 256
+
 // For sheep
 global.StatsUnchangedTolerance = 24
 global.StatsUnchangedPreferReset = false
