@@ -31,7 +31,7 @@ global.bot = bot
 global.ad_active = true
 
 global.last_status = {
-    sheep_entity_id: 0
+    sheep_entity_id: 0,
     wools: 0,
     repeats: 0,
     failures: 0
@@ -214,7 +214,16 @@ function goShearSheep(target, callback)
         if (callback)
             setTimeout(callback, 400)
     }
-    navigator.goToWork(target.position, shear, Reset)
+    const euclid_distance = bot.entity.position.distanceTo(target.position)
+    console.log("Euclid distance:", euclid_distance.toFixed(3))
+    if (euclid_distance < 3.25 && global.EnableShortDistanceOptimization)
+    {
+        shear()
+    }
+    else
+    {
+        navigator.goToWork(target.position, shear, Reset)
+    }
 }
 
 function autotoss(final_callback)
