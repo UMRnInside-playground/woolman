@@ -168,28 +168,27 @@ function ResumeWork()
 }
 
 bot.on('login', function()
-    {
-        var password = global.AuthmePassword ? global.AuthmePassword : "12345678" 
-        bot.chat("/L " + password);
-        console.log("login")
-        bot.chatAddPattern(/^\[ ?([^ ]*) -> 我?] (.*)$/, 'whisper', 'mc.66ko.cc whisper')
-        /*
-        bot.once('windowOpen', function(popup_window){
-            console.log("Window opened, clicking...")
-            bot.clickWindow(20, 0, 0)
-            bot.once('spawn', function(){
-                console.log(`Spawned at ${bot.entity.position}`)
-                ResumeWork()
-            })
+{
+    var password = global.AuthmePassword ? global.AuthmePassword : "12345678" 
+    bot.chat("/L " + password);
+    console.log("login")
+    bot.chatAddPattern(/^\[ ?([^ ]*) -> 我?] (.*)$/, 'whisper', 'mc.66ko.cc whisper')
+/*
+    bot.once('windowOpen', function(popup_window){
+        console.log("Window opened, clicking...")
+        bot.clickWindow(20, 0, 0)
+        bot.once('spawn', function(){
+            console.log(`Spawned at ${bot.entity.position}`)
+            ResumeWork()
         })
+    })
 
-        setTimeout(() => bot.equip(bot.inventory.slots[40], "hand", () => {
-            bot.activateItem()
-        }), 10000)
-        */
-        setTimeout(ResumeWork, 10000)
-    }
-)
+    setTimeout(() => bot.equip(bot.inventory.slots[40], "hand", () => {
+        bot.activateItem()
+    }), 10000)
+    */
+    setTimeout(ResumeWork, 10000)
+})
 
 bot.on('kicked', (reason) => {
     console.log(`I got kicked for`, reason)
