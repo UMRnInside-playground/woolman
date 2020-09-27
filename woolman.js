@@ -31,7 +31,7 @@ global.bot = bot
 global.ad_active = true
 
 global.last_status = {
-    bot_position: Vec3(0, 0, 0),
+    sheep_entity_id: 0
     wools: 0,
     repeats: 0,
     failures: 0
@@ -129,7 +129,7 @@ bot.on('chat', (username, message) => {
     if (!global.ad_active)
         return
 
-    const my_ad = global.woolshop_ad ? global.woolshop_ad : "MY_AD"
+    const my_ad = global.woolshop_ad || "..."
     if (message.includes(my_ad))
         return
     function dcheck(msg, a, b)
@@ -291,7 +291,7 @@ function autowork()
                 console.log("wools", wools_in_inventory)
 
                 // Make HamsterAntiCheat happy
-                if (last_status.bot_position.equals(bot.entity.position) && 
+                if (last_status.sheep_entity_id === sheep.id && 
                     last_status.wools === wools_in_inventory)
                 {
                     console.log(`Stats unchanged!`)
@@ -328,7 +328,7 @@ function autowork()
                 }
                 else
                 {
-                    last_status.bot_position = bot.entity.position
+                    last_status.sheep_entity_id = sheep.id
                     last_status.wools = wools_in_inventory
                     last_status.repeats = 0
                 }
