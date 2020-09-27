@@ -304,7 +304,7 @@ function autowork()
                         console.log(`Target sheep:`)
                         console.log(sheep)
 
-                        last_status.total_failures += 1
+                        last_status.failures += 1
 
                         if (global.StatsUnchangedPreferReset)
                         {
